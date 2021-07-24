@@ -4,6 +4,8 @@
 #include <linux/list.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
+#include "kallsyms.h"     // 新增 livepatch
+#include "ksyms.h"        // 新增 livepatch
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
@@ -209,9 +211,21 @@ static const struct file_operations fops = {
 #define MINOR_VERSION 1
 #define DEVICE_NAME "hideproc"
 
+KSYMDEF(kvm_lock);
+KSYMDEF(vm_list);
+
 static int _hideproc_init(void)
 {
     int err, dev_major;
+
+    int r;
+
+    if ((r = init_kallsyms()))
+        return r;
+
+    KSYMINIT_FAULT(kvm_lock);
+    KSYMINIT_FAULT(vm_list);
+
     dev_t dev;
     printk(KERN_INFO "@ %s\n", __func__);
     err = alloc_chrdev_region(&dev, 0, MINOR_VERSION, DEVICE_NAME);

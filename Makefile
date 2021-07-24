@@ -1,6 +1,6 @@
 MODULENAME := hideproc
 obj-m += $(MODULENAME).o
-$(MODULENAME)-y += main.o
+$(MODULENAME)-y += main.o kallsyms.o
 
 KERNELDIR ?= /lib/modules/`uname -r`/build
 PWD       := $(shell pwd)
